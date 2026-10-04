@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CipherX - Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08111f;--card:#12233a;--line:#284666;--tx:#eaf2ff;--tx2:#b8c9e1;--mut:#8aa3c2;--cy:#38bdf8;--bl:#0284c7;--gr:#4ade80;--ye:#fbbf24;--rd:#f87171}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+ radial-gradient(600px 400px at 85% -5%,rgba(56,189,248,.14),transparent 70%),
+ radial-gradient(500px 400px at 5% 70%,rgba(2,132,199,.12),transparent 70%),
+ linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px,
+ linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px;border-radius:6px}
+.hidden{display:none!important}
+.shell{width:100%;max-width:960px;display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:center}
+
+/* SIDE PANEL */
+.side .brand{font-weight:800;font-size:1.5rem;letter-spacing:-.5px;display:inline-block;margin-bottom:26px}
+.side .brand b{color:var(--cy)}
+.side h2{font-size:clamp(1.7rem,3vw,2.2rem);font-weight:800;line-height:1.15;letter-spacing:-1px;margin-bottom:14px}
+.grad{background:linear-gradient(90deg,#7dd3fc,#38bdf8 50%,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
+.side p{color:var(--tx2);margin-bottom:22px}
+.ticks{list-style:none;display:grid;gap:12px}
+.ticks li{display:flex;gap:12px;color:var(--tx2);font-size:.95rem}
+.ticks li::before{content:"✓";color:var(--gr);font-weight:800}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:34px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.card h1{font-size:1.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.card .sub{color:var(--tx2);font-size:.94rem;margin-bottom:22px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#081729;border:1px solid #34516f;border-radius:12px;padding:4px;margin-bottom:24px}
+.tab{background:none;border:0;color:var(--tx2);padding:10px;border-radius:9px;font:600 14px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:.2s}
+.tab.active{background:linear-gradient(135deg,var(--bl),#0369a1);color:#fff}
+label{display:block;font-weight:600;font-size:.9rem;color:#dbeafe;margin:16px 0 7px}
+input{width:100%;padding:13px 15px;background:#081729;border:1px solid #34516f;border-radius:10px;color:var(--tx);font:15px 'Plus Jakarta Sans',sans-serif;outline:none;transition:.25s}
+input::placeholder{color:#5f7a99}
+input:focus{border-color:var(--cy);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+.pw{position:relative}
+.pw input{padding-right:64px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--cy);font:600 13px 'Plus Jakarta Sans',sans-serif;cursor:pointer;padding:6px 10px}
+.btn{display:flex;width:100%;align-items:center;justify-content:center;margin-top:22px;padding:13px 24px;border-radius:10px;border:1px solid transparent;font:600 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:.25s;background:linear-gradient(135deg,var(--bl),#0369a1);color:#fff;box-shadow:0 4px 18px rgba(2,132,199,.3)}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(56,189,248,.35)}
+.btn:disabled{opacity:.65;cursor:not-allowed}
+.link{background:none;border:0;color:#7dd3fc;cursor:pointer;font:inherit;text-decoration:underline;padding:0}
+.link:disabled{color:var(--mut);text-decoration:none;cursor:not-allowed}
+.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px;font-size:.88rem;color:var(--tx2)}
+.meter{height:5px;background:#0b1a2d;border-radius:99px;margin-top:9px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:99px;transition:.3s}
+.mtxt{font-size:12px;color:var(--mut);margin-top:5px;min-height:18px}
+.warn{margin-top:16px;padding:11px 14px;border-left:3px solid var(--ye);background:rgba(251,191,36,.07);border-radius:8px;font-size:.86rem;color:var(--tx2)}
+.msg{margin-top:18px;font-size:14px;border-radius:10px;padding:11px 14px;overflow-wrap:anywhere;border:1px solid}
+.msg.error{color:var(--rd);background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.3)}
+.msg.ok{color:var(--gr);background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.3)}
+.back{display:inline-block;margin-top:20px;font-size:.88rem;color:var(--mut)}
+.back:hover{color:var(--cy)}
+.code-in{font:600 22px 'JetBrains Mono',monospace;letter-spacing:8px;text-align:center}
+
+@media(max-width:860px){.shell{grid-template-columns:1fr;max-width:460px}.side{display:none}.card{padding:28px 22px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+
+  <aside class="side">
+    <a href="index.html" class="brand">🔐 Cipher<b>X</b></a>
+    <h2>Private messages, <span class="grad">truly private.</span></h2>
+    <p>Sign in to send and receive end-to-end encrypted messages using your CipherX ID.</p>
+    <ul class="ticks">
+      <li>Messages are encrypted in your browser</li>
+      <li>Your real password never reaches our server</li>
+      <li>Email-verified accounts only</li>
+    </ul>
+    <a href="index.html" class="back">← Back to home</a>
+  </aside>
+
+  <section class="card" aria-label="Account access">
+    <h1 id="title">Welcome back</h1>
+    <p class="sub" id="sub">Sign in to open your secure messages.</p>
+
+    <div class="tabs" id="tabs" role="tablist">
+      <button class="tab active" data-t="login" role="tab">Sign In</button>
+      <button class="tab" data-t="register" role="tab">Create Account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="login">
+      <label for="lKey">Username or email</label>
+      <input id="lKey" autocomplete="username" spellcheck="false">
+      <label for="lPass">Password</label>
+      <div class="pw"><input id="lPass" type="password" autocomplete="current-password"><button type="button" class="eye" data-for="lPass">Show</button></div>
+      <button class="btn" id="lBtn">Sign In</button>
+      <div class="row"><a href="forgot.html" class="link">Forgot password?</a><button type="button" class="link" id="toVerify">Verify email</button></div>
+    </div>
+
+    <!-- CREATE ACCOUNT -->
+    <div id="register" class="hidden">
+      <label for="rUser">Username</label>
+      <input id="rUser" autocomplete="username" maxlength="20" placeholder="3-20 letters, numbers, _" spellcheck="false">
+      <label for="rEmail">Email</label>
+      <input id="rEmail" type="email" autocomplete="email" maxlength="254">
+      <label for="rPass">Password</label>
+      <div class="pw"><input id="rPass" type="password" autocomplete="new-password" placeholder="10+ characters, letters and numbers"><button type="button" class="eye" data-for="rPass">Show</button></div>
+      <div class="meter"><i id="mBar"></i></div><div class="mtxt" id="mTxt"></div>
+      <p class="warn">Your password also locks your encryption keys. If you forget it and reset, older messages can't be recovered.</p>
+      <button class="btn" id="rBtn">Create Account</button>
+    </div>
+
+    <!-- VERIFY EMAIL -->
+    <div id="verify" class="hidden">
+      <label for="vEmail">Email</label>
+      <input id="vEmail" type="email" autocomplete="email">
+      <label for="vCode">6-digit code from your email</label>
+      <input id="vCode" class="code-in" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+      <button class="btn" id="vBtn">Verify Email</button>
+      <div class="row"><span>No code? <button type="button" class="link" id="resend">Resend</button></span><button type="button" class="link" id="toLogin">Back to sign in</button></div>
+    </div>
+
+    <p id="msg" class="msg hidden" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<script src="crypto.js"></script>
+<script src="api.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  if (sessionStorage.getItem("cx_csrf")) { location.href = "dashboard.html"; return; }
+
+  var TEXT = {
+    login: ["Welcome back", "Sign in to open your secure messages."],
+    register: ["Create your account", "Get your CipherX ID in under a minute."],
+    verify: ["Verify your email", "Enter the code we sent to your inbox."]
+  };
+  var cooldownTimer = null;
+
+  function show(name) {
+    ["login", "register", "verify"].forEach(function (s) { $(s).classList.toggle("hidden", s !== name); });
+    $("tabs").classList.toggle("hidden", name === "verify");
+    document.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("active", t.dataset.t === name); });
+    $("title").textContent = TEXT[name][0];
+    $("sub").textContent = TEXT[name][1];
+    $("msg").classList.add("hidden");
+  }
+  function note(text, type) {
+    var m = $("msg");
+    m.textContent = text;
+    m.className = "msg " + (type || "error");
+  }
+  async function busy(btn, label, fn) {
+    var old = btn.textContent;
+    btn.disabled = true; btn.textContent = label;
+    try { await fn(); } catch (e) { note(e.message); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+  function cooldown(seconds) {
+    var b = $("resend"), left = seconds;
+    clearInterval(cooldownTimer);
+    b.disabled = true; b.textContent = "Resend (" + left + "s)";
+    cooldownTimer = setInterval(function () {
+      left--;
+      if (left <= 0) { clearInterval(cooldownTimer); b.disabled = false; b.textContent = "Resend"; }
+      else b.textContent = "Resend (" + left + "s)";
+    }, 1000);
+  }
+
+  // Tabs + navigation links
+  document.querySelectorAll(".tab").forEach(function (t) { t.onclick = function () { show(t.dataset.t); }; });
+  $("toVerify").onclick = function () {
+    var k = $("lKey").value.trim();
+    if (k.indexOf("@") > 0) $("vEmail").value = k;
+    show("verify");
+  };
+  $("toLogin").onclick = function () { show("login"); };
+  if (new URLSearchParams(location.search).get("mode") === "register") show("register");
+
+  // Show / hide password
+  document.querySelectorAll(".eye").forEach(function (b) {
+    b.onclick = function () {
+      var f = $(b.dataset.for), reveal = f.type === "password";
+      f.type = reveal ? "text" : "password";
+      b.textContent = reveal ? "Hide" : "Show";
+    };
+  });
+
+  // Password strength meter
+  $("rPass").addEventListener("input", function () {
+    var v = this.value, s = 0;
+    if (v.length >= 10) s++;
+    if (v.length >= 14) s++;
+    if (/[a-z]/.test(v) && /[A-Z]/.test(v)) s++;
+    if (/\d/.test(v)) s++;
+    if (/[^A-Za-z0-9]/.test(v)) s++;
+    var L = [["8%", "#f87171", "Very weak"], ["25%", "#f87171", "Weak"], ["50%", "#fbbf24", "Fair"],
+             ["75%", "#38bdf8", "Good"], ["100%", "#4ade80", "Strong"], ["100%", "#4ade80", "Excellent"]];
+    if (!v) { $("mBar").style.width = "0"; $("mTxt").textContent = ""; return; }
+    $("mBar").style.width = L[s][0]; $("mBar").style.background = L[s][1]; $("mTxt").textContent = L[s][2];
+  });
+
+  // CREATE ACCOUNT
+  $("rBtn").onclick = function () {
+    busy($("rBtn"), "Generating secure keys...", async function () {
+      var username = $("rUser").value.trim(), email = $("rEmail").value.trim().toLowerCase(), pw = $("rPass").value;
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) throw new Error("Username must be 3-20 letters, numbers or underscore.");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) throw new Error("Enter a valid email address.");
+      if (pw.length < 10 || !/[A-Za-z]/.test(pw) || !/\d/.test(pw)) throw new Error("Password needs 10+ characters with letters and numbers.");
+      var keys = await CX.generateKeyBundle(pw);
+      await api("/api/auth/register", { method: "POST", body: Object.assign({ username: username, email: email, password: await CX.authSecret(pw) }, keys) });
+      $("vEmail").value = email;
+      $("rPass").value = "";
+      show("verify");
+      cooldown(60);
+      note("Account created. Enter the code we emailed you.", "ok");
+    });
+  };
+
+  // VERIFY EMAIL
+  $("vBtn").onclick = function () {
+    busy($("vBtn"), "Verifying...", async function () {
+      var email = $("vEmail").value.trim(), code = $("vCode").value.trim();
+      if (!email) throw new Error("Enter your email address.");
+      if (!/^\d{6}$/.test(code)) throw new Error("Enter the 6-digit code.");
+      await api("/api/auth/verify-email", { method: "POST", body: { email: email, code: code } });
+      $("vCode").value = "";
+      show("login");
+      note("Email verified! You can sign in now.", "ok");
+    });
+  };
+
+  $("resend").onclick = async function () {
+    var email = $("vEmail").value.trim();
+    if (!email) return note("Enter your email address first.");
+    try {
+      var r = await api("/api/auth/resend-otp", { method: "POST", body: { email: email } });
+      note(r.message, "ok");
+      cooldown(60);
+    } catch (e) { note(e.message); }
+  };
+
+  // SIGN IN
+  $("lBtn").onclick = function () {
+    busy($("lBtn"), "Unlocking...", async function () {
+      var key = $("lKey").value.trim(), pw = $("lPass").value;
+      if (!key || !pw) throw new Error("Enter your username or email, and your password.");
+      var res;
+      try {
+        res = await api("/api/auth/login", { method: "POST", body: { loginKey: key, password: await CX.authSecret(pw) } });
+      } catch (e) {
+        if (e.code === "EMAIL_NOT_VERIFIED") {
+          if (key.indexOf("@") > 0) $("vEmail").value = key;
+          show("verify");
+          note("Please verify your email first.");
+          return;
+        }
+        throw e;
+      }
+      var priv;
+      try { priv = await CX.unlockPrivateKey(pw, res.keys); }
+      catch (e) { throw new Error("Could not unlock your encryption keys."); }
+      sessionStorage.setItem("cx_csrf", res.csrf_token);
+      sessionStorage.setItem("cx_user", JSON.stringify(res.user));
+      sessionStorage.setItem("cx_pub", res.keys.public_key);
+      sessionStorage.setItem("cx_priv", priv);
+      location.href = "dashboard.html";
+    });
+  };
+
+  // Enter key submits the active form
+  [["lKey", "lBtn"], ["lPass", "lBtn"], ["rUser", "rBtn"], ["rEmail", "rBtn"], ["rPass", "rBtn"], ["vEmail", "vBtn"], ["vCode", "vBtn"]]
+    .forEach(function (p) {
+      $(p[0]).addEventListener("keydown", function (e) { if (e.key === "Enter") $(p[1]).click(); });
+    });
+})();
+</script>
+</body>
+</html>

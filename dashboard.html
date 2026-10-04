@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherX - Secure Messages</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+<nav class="navbar glass-panel">
+    <div class="nav-brand"><h2>🔐 Cipher<span>X</span></h2></div>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="sender.html">Send</a>
+        <a href="receiver.html">Receive</a>
+        <a href="learn.html">Learn</a>
+    </div>
+    <div class="nav-actions"></div>
+</nav>
+
+<div class="container">
+  <div class="message-box glass-card" style="max-width:760px">
+    <h1>Secure Messages</h1>
+    <p>End-to-end encrypted. Only you and the recipient can read these.</p>
+
+    <div class="id-chip">
+      <div><small style="color:var(--text-muted)">YOUR USER ID (share this so others can message you)</small><br><code id="myId"></code></div>
+      <button class="mini" id="copyId">Copy ID</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-t="inbox">Inbox</button>
+      <button class="tab" data-t="sent">Sent</button>
+      <button class="tab" data-t="compose">Compose</button>
+    </div>
+
+    <div id="list"></div>
+
+    <div id="compose" class="hidden">
+      <label for="toId">Recipient User ID</label>
+      <input id="toId" placeholder="CX-XXXXXXXX" maxlength="11" style="text-transform:uppercase">
+      <label for="text">Message</label>
+      <textarea id="text" maxlength="20000" placeholder="Encrypted in your browser before sending..."></textarea>
+      <button class="btn" id="sendBtn">🔒 Encrypt &amp; Send</button>
+    </div>
+
+    <p id="msg" class="status hidden"></p>
+  </div>
+</div>
+
+<script src="crypto.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const user = JSON.parse(sessionStorage.getItem("cx_user") || "{}");
+const myPub = sessionStorage.getItem("cx_pub");
+let priv = null, current = "inbox";
+
+function note(text, type = "error") { const m = $("msg"); m.textContent = text; m.className = "status " + type; }
+
+async function loadBox(box) {
+    const list = $("list");
+    list.innerHTML = '<p class="muted">Decrypting...</p>';
+    const { messages } = await api("/api/messages/" + box);
+    list.innerHTML = "";
+    if (!messages.length) { list.innerHTML = '<p class="muted">No messages yet.</p>'; return; }
+    for (const m of messages) {
+        let text;
+        try { text = await CX.decryptMessage(m, priv); }
+        catch { text = "🔒 Unable to decrypt this message (key mismatch)."; }
+
+        const card = document.createElement("div"); card.className = "msg";
+        const meta = document.createElement("div"); meta.className = "msg-meta";
+        const who = document.createElement("span");
+        who.textContent = (box === "inbox" ? "From " : "To ") + m.peer_name + " (" + m.peer_id + ") · " + new Date(m.created_at).toLocaleString();
+        if (box === "inbox" && !m.read_at) {
+            const b = document.createElement("span"); b.className = "badge-new"; b.textContent = "NEW";
+            who.appendChild(b);
+            api("/api/messages/" + m.id + "/read", { method: "POST" }).catch(() => {});
+        }
+        const del = document.createElement("button"); del.className = "mini"; del.textContent = "Delete";
+        del.onclick = async () => {
+            if (!confirm("Delete this message?")) return;
+            await api("/api/messages/" + m.id, { method: "DELETE" });
+            card.remove();
+        };
+        meta.append(who, del);
+        const p = document.createElement("p"); p.textContent = text; // textContent = XSS-safe
+        card.append(meta, p);
+        list.appendChild(card);
+    }
+}
+
+function switchTab(t) {
+    current = t;
+    document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("active", x.dataset.t === t));
+    $("compose").classList.toggle("hidden", t !== "compose");
+    $("list").classList.toggle("hidden", t === "compose");
+    $("msg").classList.add("hidden");
+    if (t !== "compose") loadBox(t).catch((e) => note(e.message));
+}
+document.querySelectorAll(".tab").forEach((x) => (x.onclick = () => switchTab(x.dataset.t)));
+
+$("copyId").onclick = async () => {
+    await navigator.clipboard.writeText(user.id);
+    $("copyId").textContent = "Copied ✓";
+    setTimeout(() => ($("copyId").textContent = "Copy ID"), 1500);
+};
+
+$("sendBtn").onclick = async () => {
+    const btn = $("sendBtn"), toId = $("toId").value.trim().toUpperCase(), text = $("text").value.trim();
+    if (!/^CX-[A-Z0-9]{8}$/.test(toId)) return note("Enter a valid user ID like CX-AB12CD34.");
+    if (!text) return note("Write a message first.");
+    btn.disabled = true;
+    try {
+        note("Looking up recipient...", "ok");
+        const rec = await api("/api/users/lookup/" + toId);
+        note("Encrypting...", "ok");
+        const payload = await CX.encryptMessage(text, rec.public_key, myPub);
+        await api("/api/messages/send", { method: "POST", body: { recipient_id: rec.id, ...payload } });
+        $("text").value = "";
+        note("✅ Encrypted message delivered to " + rec.username + ".", "ok");
+    } catch (e) { note(e.message); }
+    finally { btn.disabled = false; }
+};
+
+(async () => {
+    $("myId").textContent = user.id || "";
+    try {
+        priv = await CX.importPriv(sessionStorage.getItem("cx_priv"));
+        await loadBox("inbox");
+    } catch (e) { note("Session problem: " + e.message + " Please sign in again."); }
+})();
+</script>
+</body>
+</html>

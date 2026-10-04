@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CipherX - Receive &amp; Decrypt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08111f;--bg2:#0d1a2e;--card:#12233a;--line:#284666;--tx:#eaf2ff;--tx2:#b8c9e1;--mut:#8aa3c2;--cy:#38bdf8;--bl:#0284c7;--gr:#4ade80;--ye:#fbbf24;--r:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.65;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+ radial-gradient(600px 400px at 85% -5%,rgba(56,189,248,.14),transparent 70%),
+ radial-gradient(500px 400px at 5% 60%,rgba(2,132,199,.12),transparent 70%),
+ linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px,
+ linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.hidden{display:none!important}
+
+/* NAV */
+.navbar{position:sticky;top:0;z-index:100;background:rgba(8,17,31,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(40,70,102,.6)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:68px;position:relative}
+.brand{font-weight:800;font-size:1.3rem;letter-spacing:-.5px}
+.brand b{color:var(--cy)}
+.nav-links{display:flex;gap:30px}
+.nav-links a{color:var(--tx2);font-size:14.5px;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--cy)}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.theme-toggle-btn{background:transparent;border:1px solid var(--line);color:var(--tx);height:38px;border-radius:10px;font:600 13.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:.2s}
+.theme-toggle-btn:hover{border-color:var(--cy);color:var(--cy)}
+.burger{display:none;width:40px;padding:0;font-size:18px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:10px;border:1px solid transparent;font:600 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:.25s;background:linear-gradient(135deg,var(--bl),#0369a1);color:#fff;box-shadow:0 4px 18px rgba(2,132,199,.3)}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(56,189,248,.35)}
+.btn:disabled{cursor:not-allowed}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--tx);box-shadow:none}
+.btn.ghost:hover:not(:disabled){border-color:var(--cy);color:var(--cy);background:rgba(56,189,248,.08)}
+.btn.full{width:100%;margin-top:20px}
+
+/* PAGE */
+.page{padding:56px 0 30px}
+.head{margin-bottom:34px}
+.eyebrow{display:inline-block;font:600 12px 'JetBrains Mono',monospace;letter-spacing:1.5px;color:var(--cy);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+h1{font-size:clamp(1.9rem,4vw,2.6rem);font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:10px}
+.grad{background:linear-gradient(90deg,#7dd3fc,#38bdf8 50%,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--tx2);max-width:640px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start}
+
+/* PANEL + FORM */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:.92rem;color:#dbeafe;margin:0 0 8px}
+.hint{font:400 12px 'JetBrains Mono',monospace;color:var(--mut)}
+input,textarea{width:100%;padding:14px 16px;background:#081729;border:1px solid #34516f;border-radius:10px;color:var(--tx);font:15px 'Plus Jakarta Sans',sans-serif;outline:none;transition:.25s}
+input:focus,textarea:focus{border-color:var(--cy);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+textarea{min-height:130px;resize:vertical}
+textarea[readonly]{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--mut);min-height:110px}
+#decryptedMessage{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:var(--tx);text-align:left;min-height:120px}
+.pw{position:relative}
+.pw input{padding-right:70px}
+.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--cy);font:600 13px 'Plus Jakarta Sans',sans-serif;cursor:pointer;padding:6px 10px}
+
+/* RESULTS */
+.result{margin-top:28px;padding-top:26px;border-top:1px solid #34516f;animation:rise .4s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tag{font:600 11px 'JetBrains Mono',monospace;color:var(--gr);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);padding:3px 9px;border-radius:99px}
+.success-result-card{text-align:center;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:14px;padding:26px 22px}
+.success-icon-badge{font-size:34px;margin-bottom:6px}
+.success-result-card h3{color:var(--gr);margin-bottom:6px}
+.success-result-card p{color:var(--tx2);font-size:.94rem;margin-bottom:16px}
+.actions{display:flex;gap:10px;margin-top:14px}
+.actions .btn{flex:1}
+.status{margin-top:20px;font-size:14px;color:var(--ye);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:11px 14px;overflow-wrap:anywhere}
+.status:empty{display:none}
+
+/* SIDEBAR */
+.side{display:grid;gap:18px}
+.info{background:#0b1a2d;border:1px solid rgba(56,189,248,.18);border-radius:var(--r);padding:22px}
+.info h3{font-size:1rem;margin-bottom:12px;color:#dff1ff}
+.info ol,.info ul{padding-left:20px;color:var(--tx2);font-size:.92rem;display:grid;gap:8px}
+.info li::marker{color:var(--cy);font-weight:700}
+.info.accent{border-color:rgba(56,189,248,.45);background:linear-gradient(160deg,#0f2b4a,#0b1a2d)}
+.info.accent p{color:var(--tx2);font-size:.92rem;margin-bottom:14px}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(40,70,102,.6);padding:30px 0;margin-top:50px;color:var(--mut);font-size:14px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.foot div{display:flex;gap:22px}
+.foot a:hover{color:var(--cy)}
+
+@media(max-width:900px){
+ .layout{grid-template-columns:1fr}
+ .nav-links{display:none;position:absolute;top:68px;left:-24px;right:-24px;flex-direction:column;gap:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:8px 24px 16px}
+ .nav-links.open{display:flex}.nav-links a{padding:12px 0}
+ .burger{display:block}
+}
+@media(max-width:560px){.panel{padding:24px 18px}.actions{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="navbar" aria-label="Main">
+  <div class="wrap nav-in">
+    <a href="index.html" class="brand">🔐 Cipher<b>X</b></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="sender.html">Send</a>
+      <a href="receiver.html" class="active">Receive</a>
+      <a href="learn.html">Learn</a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle-btn burger" id="burger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">PASSPHRASE DECRYPTION</span>
+      <h1>Receive &amp; <span class="grad">decrypt a message</span></h1>
+      <p class="lead">Enter the Message ID you were given, retrieve the encrypted message, then use the secret passphrase to unlock it. Decryption happens only in your browser.</p>
+    </div>
+
+    <div class="layout">
+      <section class="panel" aria-label="Decrypt a message">
+
+        <div>
+          <label for="messageId"><span>Message ID</span><span class="hint">from the sender</span></label>
+          <input type="text" id="messageId" autocomplete="off" spellcheck="false" placeholder="Paste the Message ID">
+        </div>
+        <button id="fetchBtn" class="btn full">📥 Retrieve message</button>
+
+        <div id="encryptedSection" class="result hidden">
+          <label><span>Encrypted ciphertext</span><span class="tag">RETRIEVED</span></label>
+          <textarea id="encryptedMessage" readonly placeholder="Fetched ciphertext appears here..."></textarea>
+
+          <div style="margin-top:22px">
+            <label for="secretKey"><span>Secret passphrase</span><span class="hint">never sent to the server</span></label>
+            <div class="pw">
+              <input type="password" id="secretKey" autocomplete="off" placeholder="Enter the passphrase">
+              <button type="button" id="showPw" aria-label="Show or hide passphrase">Show</button>
+            </div>
+          </div>
+          <button id="decryptBtn" class="btn full">🔓 Decrypt message</button>
+        </div>
+
+        <div id="decryptedSection" class="result hidden success-result-card">
+          <div class="success-icon-badge">🔓</div>
+          <h3>Message decrypted</h3>
+          <p>Integrity verified. The message was not altered in transit.</p>
+          <textarea id="decryptedMessage" readonly placeholder="Decrypted text..."></textarea>
+          <div class="actions">
+            <button type="button" class="btn ghost" id="copyPlain">Copy text</button>
+            <button type="button" class="btn ghost" id="clearAll">Clear screen</button>
+          </div>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <aside class="side">
+        <div class="info">
+          <h3>How it works</h3>
+          <ol>
+            <li>Paste the Message ID and retrieve the ciphertext.</li>
+            <li>The ciphertext is unreadable without the passphrase.</li>
+            <li>Enter the passphrase. Your browser unlocks the message.</li>
+          </ol>
+        </div>
+        <div class="info">
+          <h3>Decryption failed?</h3>
+          <ul>
+            <li>Check the passphrase for typos and capital letters.</li>
+            <li>Confirm the Message ID is complete, with no spaces.</li>
+            <li>A changed message will always fail. That is by design.</li>
+          </ul>
+        </div>
+        <div class="info accent">
+          <h3>Messages sent to your ID</h3>
+          <p>Direct account messages appear in your inbox. No passphrase is needed.</p>
+          <a href="dashboard.html" class="btn ghost" style="width:100%">Open Messages →</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="yr">2026</span> CipherX · Secure Messaging &amp; Cybersecurity Lab</span>
+    <div><a href="learn.html">Learn</a><a href="sender.html">Send</a><a href="dashboard.html">Messages</a></div>
+  </div>
+</footer>
+
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script src="receiver.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  $("yr").textContent = new Date().getFullYear();
+
+  // Mobile menu
+  $("burger").addEventListener("click", function () {
+    var open = $("navLinks").classList.toggle("open");
+    this.setAttribute("aria-expanded", open);
+  });
+
+  // Prefill the ID from a link such as receiver.html?id=XXXX
+  var pre = new URLSearchParams(location.search).get("id");
+  if (pre) $("messageId").value = pre.trim();
+
+  // Show / hide passphrase
+  $("showPw").addEventListener("click", function () {
+    var f = $("secretKey"), show = f.type === "password";
+    f.type = show ? "text" : "password";
+    this.textContent = show ? "Hide" : "Show";
+  });
+
+  // Copy decrypted text
+  $("copyPlain").addEventListener("click", async function () {
+    var btn = this, old = btn.textContent;
+    try {
+      await navigator.clipboard.writeText($("decryptedMessage").value);
+      btn.textContent = "Copied ✓";
+    } catch (e) {
+      btn.textContent = "Copy failed";
+    }
+    setTimeout(function () { btn.textContent = old; }, 1600);
+  });
+
+  // Wipe decrypted content from the screen
+  $("clearAll").addEventListener("click", function () {
+    $("decryptedMessage").value = "";
+    $("secretKey").value = "";
+    $("decryptedSection").classList.add("hidden");
+    $("status").textContent = "Screen cleared.";
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CipherX - End-to-End Encrypted Messaging</title>
+<meta name="description" content="CipherX is a secure messaging platform. Messages are encrypted in your browser and only the recipient can read them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08111f;--bg2:#0d1a2e;--card:#12233a;--line:#284666;--tx:#eaf2ff;--tx2:#b8c9e1;--mut:#8aa3c2;--cy:#38bdf8;--bl:#0284c7;--gr:#4ade80;--r:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.65;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+ radial-gradient(600px 400px at 85% -5%,rgba(56,189,248,.14),transparent 70%),
+ radial-gradient(500px 400px at 5% 40%,rgba(2,132,199,.12),transparent 70%),
+ linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px,
+ linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px) 0 0/48px 48px}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+section{padding:88px 0}
+.eyebrow{display:inline-block;font:600 12px 'JetBrains Mono',monospace;letter-spacing:1.5px;color:var(--cy);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+h2{font-size:clamp(1.7rem,3vw,2.3rem);font-weight:800;letter-spacing:-.5px;line-height:1.2;margin-bottom:12px}
+.sub{color:var(--tx2);max-width:620px;margin:0 auto 48px}
+.center{text-align:center}
+.grad{background:linear-gradient(90deg,#7dd3fc,#38bdf8 50%,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(8,17,31,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(40,70,102,.6)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{font-weight:800;font-size:1.3rem;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.brand b{color:var(--cy)}
+.links{display:flex;gap:30px}
+.links a{color:var(--tx2);font-size:14.5px;font-weight:500;transition:color .2s}
+.links a:hover{color:var(--cy)}
+.acts{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;border:1px solid transparent;font:600 15px inherit;font-family:inherit;cursor:pointer;transition:.25s;background:linear-gradient(135deg,var(--bl),#0369a1);color:#fff;box-shadow:0 4px 18px rgba(2,132,199,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(56,189,248,.35)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--tx);box-shadow:none}
+.btn.ghost:hover{border-color:var(--cy);color:var(--cy);background:rgba(56,189,248,.08)}
+.btn.sm{padding:9px 18px;font-size:14px}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--tx);width:40px;height:40px;border-radius:10px;font-size:18px;cursor:pointer}
+
+/* HERO */
+.hero{padding:84px 0 70px}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+h1{font-size:clamp(2.3rem,5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:20px}
+.lead{font-size:1.1rem;color:var(--tx2);max-width:540px;margin-bottom:32px}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:40px}
+.stats{display:flex;flex-wrap:wrap;gap:34px}
+.stat b{display:block;font:600 1.05rem 'JetBrains Mono',monospace;color:var(--cy)}
+.stat span{font-size:13px;color:var(--mut)}
+
+/* HERO VISUAL */
+.demo{background:linear-gradient(160deg,#14283f,#0e1d33);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 60px rgba(56,189,248,.08);animation:float 6s ease-in-out infinite alternate}
+@keyframes float{to{transform:translateY(-10px)}}
+.demo-top{display:flex;align-items:center;gap:7px;margin-bottom:18px}
+.demo-top i{width:10px;height:10px;border-radius:50%;background:#34516f}
+.demo-top span{margin-left:auto;font:600 11px 'JetBrains Mono',monospace;color:var(--gr);display:flex;align-items:center;gap:6px}
+.demo-top span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr)}
+.bubble{border-radius:12px;padding:13px 15px;font-size:14px;margin-bottom:12px}
+.bubble small{display:block;font:500 11px 'JetBrains Mono',monospace;letter-spacing:.8px;margin-bottom:5px}
+.b-plain{background:#0b1a2d;border:1px solid rgba(74,222,128,.3)}
+.b-plain small{color:var(--gr)}
+.b-cipher{background:#081729;border:1px dashed #34516f;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);word-break:break-all}
+.b-cipher small{color:#fbbf24}
+.demo-id{display:flex;justify-content:space-between;font:500 12px 'JetBrains Mono',monospace;color:var(--mut);margin-top:6px}
+.demo-id b{color:var(--cy);font-weight:600}
+
+/* GRID CARDS */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;transition:.3s;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cy),transparent);opacity:0;transition:.3s}
+.card:hover{transform:translateY(-6px);border-color:var(--cy);box-shadow:0 16px 40px rgba(56,189,248,.14)}
+.card:hover::before{opacity:1}
+.ico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);margin-bottom:16px}
+.card h3{font-size:1.1rem;margin-bottom:8px;color:#dff1ff}
+.card p{color:var(--tx2);font-size:.94rem}
+
+/* STEPS */
+.alt{background:linear-gradient(180deg,transparent,rgba(13,26,46,.7),transparent)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
+.step{position:relative;background:#0b1a2d;border:1px solid rgba(56,189,248,.18);border-radius:var(--r);padding:24px 20px}
+.step::before{counter-increment:s;content:"0" counter(s);font:700 13px 'JetBrains Mono',monospace;color:var(--cy);display:block;margin-bottom:12px}
+.step h3{font-size:1.02rem;margin-bottom:6px}
+.step p{font-size:.9rem;color:var(--tx2)}
+
+/* SECURITY */
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.spec{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:14.5px}
+.spec td{padding:14px 18px;border-bottom:1px solid rgba(40,70,102,.6)}
+.spec tr:last-child td{border-bottom:0}
+.spec td:first-child{color:var(--mut);width:42%}
+.spec td:last-child{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cy)}
+.ticks{list-style:none;margin-top:22px;display:grid;gap:12px}
+.ticks li{display:flex;gap:12px;color:var(--tx2);font-size:.96rem}
+.ticks li::before{content:"✓";color:var(--gr);font-weight:800}
+.note{margin-top:22px;padding:14px 18px;border-left:3px solid #fbbf24;background:rgba(251,191,36,.07);border-radius:8px;font-size:.9rem;color:var(--tx2)}
+
+/* CTA + FOOTER */
+.cta-box{text-align:center;padding:56px 28px;border-radius:24px;background:linear-gradient(135deg,#0f2b4a,#0a1c33);border:1px solid var(--line);box-shadow:0 0 70px rgba(56,189,248,.1)}
+.cta-box p{color:var(--tx2);margin:0 auto 28px;max-width:520px}
+footer{border-top:1px solid rgba(40,70,102,.6);padding:34px 0;margin-top:40px;color:var(--mut);font-size:14px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot nav{all:unset;display:flex;gap:22px}
+.foot a:hover{color:var(--cy)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(22px);transition:.7s ease}
+.rv.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+ .hero-grid,.sec-grid{grid-template-columns:1fr}
+ .grid3{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}
+ .links{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;gap:0;background:var(--bg2);border-bottom:1px solid var(--line);padding:8px 24px 16px}
+ .links.open{display:flex}.links a{padding:12px 0}
+ .burger{display:block}
+ .acts .btn.ghost{display:none}
+ section{padding:64px 0}
+}
+@media(max-width:600px){.grid3,.steps{grid-template-columns:1fr}.cta .btn{width:100%}.hero{padding-top:56px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap nav-in">
+    <a href="index.html" class="brand">🔐 Cipher<b>X</b></a>
+    <div class="links" id="links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+      <a href="learn.html">Learn</a>
+    </div>
+    <div class="acts">
+      <a href="login.html" class="btn ghost sm" id="navIn">Sign In</a>
+      <a href="login.html" class="btn sm" id="navUp">Get Started</a>
+      <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">END-TO-END ENCRYPTED</span>
+      <h1>Messages only the <span class="grad">right person</span> can read.</h1>
+      <p class="lead">CipherX encrypts every message in your browser before it leaves your device. Our servers store only unreadable ciphertext, so nobody in between can read it. Not even us.</p>
+      <div class="cta">
+        <a href="login.html" class="btn" id="heroCta">Create free account →</a>
+        <a href="#how" class="btn ghost">See how it works</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>AES-256-GCM</b><span>Message encryption</span></div>
+        <div class="stat"><b>RSA-2048</b><span>Key protection</span></div>
+        <div class="stat"><b>Argon2id</b><span>Password hashing</span></div>
+      </div>
+    </div>
+
+    <div class="demo" aria-hidden="true">
+      <div class="demo-top"><i></i><i></i><i></i><span>ENCRYPTED</span></div>
+      <div class="bubble b-plain"><small>YOU TYPE</small>Meet at 6pm. Bring the documents.</div>
+      <div class="bubble b-cipher"><small>SERVER STORES</small>kP3x9Zq+Rm4vT1yB7nWcE0aLd8HsUj2fGxQ5oVtYi6Nk3bMr9PzAe1CwDh7S…</div>
+      <div class="bubble b-plain"><small>RECIPIENT READS</small>Meet at 6pm. Bring the documents.</div>
+      <div class="demo-id"><span>From <b>CX-7K2M9PQA</b></span><span>To <b>CX-B4N8XW3D</b></span></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap center">
+    <span class="eyebrow">FEATURES</span>
+    <h2>Built for privacy from the first line of code</h2>
+    <p class="sub">Everything you need to communicate securely, with nothing that gets in the way.</p>
+    <div class="grid3" style="text-align:left">
+      <article class="card rv"><div class="ico">🔒</div><h3>End-to-end encryption</h3><p>Messages are encrypted on your device and decrypted only on the recipient's device. The keys never leave your browser unprotected.</p></article>
+      <article class="card rv"><div class="ico">🆔</div><h3>Your own CipherX ID</h3><p>Every account gets a unique ID like <code>CX-7K2M9PQA</code>. Share it, and anyone can send you an encrypted message.</p></article>
+      <article class="card rv"><div class="ico">✉️</div><h3>Verified accounts</h3><p>Email verification with one-time codes keeps fake and throwaway accounts out of your conversations.</p></article>
+      <article class="card rv"><div class="ico">🕶️</div><h3>Zero-knowledge server</h3><p>We cannot read your messages. The server only ever sees encrypted data it has no key for.</p></article>
+      <article class="card rv"><div class="ico">🛡️</div><h3>Attack protection</h3><p>Rate limiting, account lockout, CSRF protection and secure headers defend against brute-force and web attacks.</p></article>
+      <article class="card rv"><div class="ico">🔑</div><h3>Passphrase cipher tool</h3><p>Prefer a shared secret? Encrypt any text with a passphrase and share it by Message ID, no account on the other side needed.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap center">
+    <span class="eyebrow">HOW IT WORKS</span>
+    <h2>Secure messaging in four steps</h2>
+    <p class="sub">No plugins, no installs. It all happens in your browser.</p>
+    <div class="steps" style="text-align:left">
+      <div class="step rv"><h3>Create your account</h3><p>Sign up and verify your email. Your encryption keys are generated on your device.</p></div>
+      <div class="step rv"><h3>Share your ID</h3><p>Copy your CipherX ID from the dashboard and give it to the people you want to hear from.</p></div>
+      <div class="step rv"><h3>Write and send</h3><p>Enter their ID and your message. It is encrypted before it ever leaves your browser.</p></div>
+      <div class="step rv"><h3>They decrypt it</h3><p>Only the recipient's private key can unlock the message, and only on their device.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap sec-grid">
+    <div class="rv">
+      <span class="eyebrow">SECURITY</span>
+      <h2>Modern cryptography, no shortcuts</h2>
+      <p style="color:var(--tx2)">CipherX uses the standard, browser-native Web Crypto API. There is no home-made cryptography in the message path.</p>
+      <ul class="ticks">
+        <li>Private keys are locked with your password before they are stored</li>
+        <li>Your real password is never sent to the server</li>
+        <li>Each message uses its own random encryption key</li>
+        <li>Tampered messages fail to decrypt instead of showing garbage</li>
+      </ul>
+      <p class="note"><strong>Being transparent:</strong> the server can see who has an account and when messages are sent between IDs. It can never see what they say.</p>
+    </div>
+    <table class="spec rv" aria-label="Cryptography used">
+      <tr><td>Message encryption</td><td>AES-256-GCM</td></tr>
+      <tr><td>Key exchange</td><td>RSA-2048 OAEP</td></tr>
+      <tr><td>Key derivation</td><td>PBKDF2-SHA256 · 250k</td></tr>
+      <tr><td>Password storage</td><td>Argon2id</td></tr>
+      <tr><td>Sessions</td><td>HttpOnly + CSRF token</td></tr>
+      <tr><td>Verification</td><td>Email one-time code</td></tr>
+    </table>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="cta-box rv">
+      <h2>Start sending messages only they can read</h2>
+      <p>Create your free account in under a minute.</p>
+      <a href="login.html" class="btn" id="ctaBtn">Get started free →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="yr">2026</span> CipherX · Secure Messaging &amp; Cybersecurity Lab</span>
+    <nav aria-label="Footer"><a href="learn.html">Learn</a><a href="#security">Security</a><a href="login.html">Sign In</a></nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Footer year
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  // Mobile menu
+  var burger = document.getElementById("burger"), links = document.getElementById("links");
+  burger.addEventListener("click", function () {
+    var open = links.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open);
+  });
+  links.addEventListener("click", function (e) { if (e.target.tagName === "A") links.classList.remove("open"); });
+
+  // If already signed in, point buttons to the dashboard
+  var signedIn = false;
+  try { signedIn = !!sessionStorage.getItem("cx_csrf"); } catch (e) {}
+  if (signedIn) {
+    var inBtn = document.getElementById("navIn"), upBtn = document.getElementById("navUp");
+    inBtn.textContent = "Send / Receive"; inBtn.href = "sender.html";
+    upBtn.textContent = "Open Messages"; upBtn.href = "dashboard.html";
+    var hero = document.getElementById("heroCta"), cta = document.getElementById("ctaBtn");
+    hero.textContent = cta.textContent = "Open your messages →";
+    hero.href = cta.href = "dashboard.html";
+  }
+
+  // Scroll reveal
+  var items = document.querySelectorAll(".rv");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    items.forEach(function (el, i) { el.style.transitionDelay = (i % 3) * 90 + "ms"; io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+</body>
+</html>

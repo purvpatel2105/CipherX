@@ -1,0 +1,226 @@
+/* ==========================================================================
+   CipherX - App stylesheet
+   Used by: dashboard.html, forgot.html
+   Load order: style.css FIRST, then app.css
+   ========================================================================== */
+
+/* --- UTILITIES --- */
+.hidden {
+    display: none !important;
+}
+
+.muted {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 28px 0;
+    font-size: 0.95rem;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #7dd3fc;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.link-btn:hover {
+    color: var(--accent-cyan);
+}
+
+.link-btn:disabled {
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: not-allowed;
+}
+
+/* --- STATUS COLOURS (extend .status from style.css) --- */
+.status.ok {
+    color: var(--accent-green);
+    background: rgba(74, 222, 128, 0.08);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.status.error {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* --- TABS (Inbox / Sent / Compose) --- */
+.tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab {
+    flex: 0 0 auto;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 11px 18px;
+    color: var(--text-secondary);
+    font: 600 14px 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tab.active {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+}
+
+/* --- USER ID BADGE --- */
+.id-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    background: linear-gradient(160deg, #0f2b4a, #0b1a2d);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    border-radius: 12px;
+}
+
+.id-chip small {
+    font: 600 11px 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.id-chip code {
+    display: inline-block;
+    margin-top: 2px;
+    font: 700 1.15rem 'JetBrains Mono', monospace;
+    letter-spacing: 1.5px;
+    color: var(--accent-cyan);
+    user-select: all;
+}
+
+/* --- SMALL BUTTONS (Copy ID, Delete) --- */
+.mini {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: #7dd3fc;
+    border-radius: 8px;
+    padding: 6px 13px;
+    font: 600 13px 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-smooth);
+}
+
+.mini:hover:not(:disabled) {
+    border-color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.1);
+    color: #fff;
+}
+
+.mini:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- MESSAGE CARDS --- */
+.msg {
+    background: #0b1a2d;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-radius: 12px;
+    padding: 15px 18px;
+    margin-bottom: 12px;
+    animation: msgIn 0.3s ease-out;
+    transition: var(--transition-smooth);
+}
+
+.msg:hover {
+    border-color: rgba(56, 189, 248, 0.45);
+}
+
+@keyframes msgIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+.msg-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.msg-meta span {
+    overflow-wrap: anywhere;
+}
+
+.msg p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--text-primary);
+    font-size: 0.97rem;
+}
+
+.badge-new {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 6px;
+    background: var(--accent-green);
+    color: #08111f;
+    font: 700 10.5px 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 560px) {
+    .id-chip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .id-chip .mini {
+        width: 100%;
+        padding: 9px 13px;
+    }
+
+    .msg-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .msg-meta .mini {
+        align-self: flex-start;
+    }
+
+    .tab {
+        padding: 11px 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .msg {
+        animation: none;
+    }
+}
